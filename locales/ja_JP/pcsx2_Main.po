@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PCSX2 1.6.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2020-01-16 20:30+0900\n"
-"PO-Revision-Date: 2020-01-17 21:57+0900\n"
+"POT-Creation-Date: 2020-02-10 17:29+0000\n"
+"PO-Revision-Date: 2020-02-11 21:17+0900\n"
 "Last-Translator: Chromaryu <knight.ryu12@gmail.com>\n"
 "Language-Team: DeltaHF Chromaryu\n"
 "Language: ja_JP\n"
@@ -489,7 +489,7 @@ msgstr "空ディスクドライブ起動。PS2のBIOSのシステムメニュ�
 
 #: pcsx2/gui/AppInit.cpp:256
 msgid "boots from the CDVD plugin (overrides IsoFile parameter)"
-msgstr "CDVDプラグインから起動する（IsoFileパラメータを無視します）"
+msgstr "CDVDプラグインから起動する（IsoFileパラメータを無視する）"
 
 #: pcsx2/gui/AppInit.cpp:258
 msgid "disables all speedhacks"
@@ -557,14 +557,14 @@ msgstr ""
 "OKを押してデフォルトプラグインを使用するか、キャンセルを押して%sを閉じてくだ"
 "さい。"
 
+#: pcsx2/gui/AppInit.cpp:557
+msgid "PCSX2 Error: Hardware Deficiency"
+msgstr "PCSX2エラー: ハードウェア構成が最低基準を満たしていません"
+
 #: pcsx2/gui/AppInit.cpp:557 pcsx2/gui/AppInit.cpp:569
 #, c-format
 msgid "Press OK to close %s."
 msgstr "OKを押して%sを閉じてください。"
-
-#: pcsx2/gui/AppInit.cpp:557
-msgid "PCSX2 Error: Hardware Deficiency"
-msgstr "PCSX2エラー: ハードウェア構成が最低基準を満たしていません"
 
 #: pcsx2/gui/AppInit.cpp:570
 #, c-format
@@ -652,13 +652,13 @@ msgstr ""
 "警告: システムプラグインがロードされませんでした。PCSX2を実行できないかもしれ"
 "ません。"
 
-#: pcsx2/gui/AppMain.cpp:184
-msgid "Press Ok to go to the BIOS Configuration Panel."
-msgstr "OKを押してBIOS設定画面に移動します。"
-
 #: pcsx2/gui/AppMain.cpp:184 pcsx2/gui/AppMain.cpp:189
 msgid "PS2 BIOS Error"
 msgstr "PS2BIOSエラー"
+
+#: pcsx2/gui/AppMain.cpp:184
+msgid "Press Ok to go to the BIOS Configuration Panel."
+msgstr "OKを押してBIOS設定画面に移動します。"
 
 #: pcsx2/gui/AppMain.cpp:207
 msgid "Warning! Valid BIOS has not been selected. PCSX2 may be inoperable."
@@ -692,12 +692,12 @@ msgid ""
 msgstr "ISOリストを無視し、起動するISOを手動で選択する。"
 
 #: pcsx2/gui/AppRes.cpp:48
-msgid "Browse..."
-msgstr "参照..."
-
-#: pcsx2/gui/AppRes.cpp:48
 msgid "Browse for an ISO that is not in your recent history."
 msgstr "ヒストリにないISOを参照する。"
+
+#: pcsx2/gui/AppRes.cpp:48
+msgid "Browse..."
+msgstr "参照..."
 
 #: pcsx2/gui/AppUserMode.cpp:92
 msgid "The following folders exist, but are not writable:"
@@ -997,12 +997,12 @@ msgid "64MB File"
 msgstr "64MBファイル"
 
 #: pcsx2/gui/Dialogs/ConvertMemoryCardDialog.cpp:95
-msgid "Folder"
-msgstr "フォルダー"
-
-#: pcsx2/gui/Dialogs/ConvertMemoryCardDialog.cpp:95
 msgid "Convert this memory card to a folder of individual saves."
 msgstr "このメモリーカードを別々のセーブデータが入ったフォルダに変換する。"
+
+#: pcsx2/gui/Dialogs/ConvertMemoryCardDialog.cpp:95
+msgid "Folder"
+msgstr "フォルダー"
 
 #: pcsx2/gui/Dialogs/ConvertMemoryCardDialog.cpp:122
 #: pcsx2/gui/Dialogs/CreateMemoryCardDialog.cpp:179
@@ -1160,19 +1160,19 @@ msgstr ""
 "このメモリーカードはPS1専用のメモリーカードで、PS2ゲームには使用できません。"
 
 #: pcsx2/gui/Dialogs/FirstTimeWizard.cpp:48
-msgid "Settings"
-msgstr "フォルダー設定"
-
-#: pcsx2/gui/Dialogs/FirstTimeWizard.cpp:48
 #, c-format
 msgid "Select a folder for %s settings"
 msgstr "%s設定の保存先フォルダーを指定してください"
 
-#: pcsx2/gui/Dialogs/FirstTimeWizard.cpp:84
+#: pcsx2/gui/Dialogs/FirstTimeWizard.cpp:48
+msgid "Settings"
+msgstr "フォルダー設定"
+
+#: pcsx2/gui/Dialogs/FirstTimeWizard.cpp:86
 msgid "Language selector"
 msgstr "言語選択"
 
-#: pcsx2/gui/Dialogs/FirstTimeWizard.cpp:87
+#: pcsx2/gui/Dialogs/FirstTimeWizard.cpp:89
 msgid ""
 "Change the language only if you need to.\n"
 "The system default should be fine for most operating systems."
@@ -1180,19 +1180,19 @@ msgstr ""
 "言語の変更が必要な場合は選択してください。\n"
 "通常は「System Default」のままでかまいません。"
 
-#: pcsx2/gui/Dialogs/FirstTimeWizard.cpp:93
+#: pcsx2/gui/Dialogs/FirstTimeWizard.cpp:95
 msgid "Welcome to PCSX2!"
 msgstr "PCSX2へようこそ！"
 
-#: pcsx2/gui/Dialogs/FirstTimeWizard.cpp:104
-msgid "Configuration Guides (online)"
-msgstr "設定ガイド集（オンライン）"
+#: pcsx2/gui/Dialogs/FirstTimeWizard.cpp:106
+msgid "Configuration Guide"
+msgstr "設定ガイド集"
 
-#: pcsx2/gui/Dialogs/FirstTimeWizard.cpp:108
-msgid "Readme / FAQ (Offline/PDF)"
-msgstr "Readme / FAQ（オフライン / PDF）"
+#: pcsx2/gui/Dialogs/FirstTimeWizard.cpp:110
+msgid "Readme / FAQ"
+msgstr "Readme / FAQ"
 
-#: pcsx2/gui/Dialogs/FirstTimeWizard.cpp:117
+#: pcsx2/gui/Dialogs/FirstTimeWizard.cpp:119
 #, c-format
 msgid "%s First Time Configuration"
 msgstr "%s初回起動設定"
@@ -1313,7 +1313,7 @@ msgstr "言語選択"
 
 #: pcsx2/gui/ExecutorThread.cpp:41
 msgid "Logs events as they are passed to the PS2 virtual machine."
-msgstr "PS2仮想マシンに送られるイベントのログを渡されたままする"
+msgstr "PS2仮想マシンに送られるイベントを渡されたままログをする"
 
 #: pcsx2/gui/GlobalCommands.cpp:316
 msgid "Exit PCSX2?"
@@ -2383,15 +2383,15 @@ msgid "Delete memory file?"
 msgstr "メモリーカードファイルを削除しますか？"
 
 #: pcsx2/gui/Panels/MemoryCardListPanel.cpp:710
-msgid "Failed: Can only duplicate an existing card."
-msgstr "失敗：複製元のメモリーカードがありません。"
-
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:710
 #: pcsx2/gui/Panels/MemoryCardListPanel.cpp:721
 #: pcsx2/gui/Panels/MemoryCardListPanel.cpp:728
 #: pcsx2/gui/Panels/MemoryCardListPanel.cpp:742
 msgid "Duplicate memory card"
 msgstr "メモリーカードの複製"
+
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:710
+msgid "Failed: Can only duplicate an existing card."
+msgstr "失敗：複製元のメモリーカードがありません。"
 
 #: pcsx2/gui/Panels/MemoryCardListPanel.cpp:728
 msgid ""
@@ -2525,20 +2525,20 @@ msgid "Created on"
 msgstr "作成日時"
 
 #: pcsx2/gui/Panels/MemoryCardListView.cpp:151
-msgid "Yes"
-msgstr "はい"
-
-#: pcsx2/gui/Panels/MemoryCardListView.cpp:151
 msgid "No"
 msgstr "いいえ"
 
-#: pcsx2/gui/Panels/MemoryCardListView.cpp:152
-msgid "PSX"
-msgstr "PS1"
+#: pcsx2/gui/Panels/MemoryCardListView.cpp:151
+msgid "Yes"
+msgstr "はい"
 
 #: pcsx2/gui/Panels/MemoryCardListView.cpp:152
 msgid "PS2"
 msgstr "PS2"
+
+#: pcsx2/gui/Panels/MemoryCardListView.cpp:152
+msgid "PSX"
+msgstr "PS1"
 
 #: pcsx2/gui/Panels/MemoryCardListView.cpp:165
 msgid "[-- Unused cards --]"

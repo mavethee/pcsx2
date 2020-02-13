@@ -300,9 +300,6 @@ CRC::Game CRC::m_games[] =
 	{0xFDA1CBF6, Sly2, EU, 0},
 	{0x15DD1F6F, Sly2, NoRegion, 0},
 	{0xBF1739E2, Sly2, NoRegion, 0}, // Prototype maybe, is it official ? I don't remember, found it when testing my dumps (LT).
-	{0xA9C82AB9, DemonStone, US, 0},
-	{0x7C7578F3, DemonStone, EU, 0},
-	{0x22425C19, DemonStone, KO, 0},
 	{0x506644B3, BigMuthaTruckers, EU, 0},
 	{0x90F0D852, BigMuthaTruckers, US, 0},
 	{0x92624842, BigMuthaTruckers, US, 0},
@@ -462,6 +459,7 @@ CRC::Game CRC::m_games[] =
 	{0x9184AAF1, Jak2, US, TextureInsideRt},
 	{0xA2034C69, Jak2, US, TextureInsideRt}, // Demo
 	{0x25FE4D23, Jak2, KO, TextureInsideRt},
+	{0xB4976DAF, Jak2, JP, TextureInsideRt},
 	{0x12804727, Jak3, EU, TextureInsideRt},
 	{0xE59E10BF, Jak3, EU, TextureInsideRt},
 	{0xCA68E4D5, Jak3, EU, TextureInsideRt}, // Demo
