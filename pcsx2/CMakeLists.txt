@@ -1,3 +1,6 @@
+include(macros/GlibCompileResourcesSupport)
+
+
 if (openSUSE)
     # openSUSE don't install wx in a standard library system
     # path. Let's bypass the dynamic linker and hardcode the path.
@@ -14,11 +17,9 @@ endif()
 
 set(CommonFlags
     -fno-strict-aliasing
-    -Wno-parentheses
     -Wstrict-aliasing # Allow to track strict aliasing issue.
-    -Wno-char-subscripts # only impact svu which is deprecated
+    -Wno-parentheses
     -Wno-missing-braces
-    #-Wno-ignored-attributes # don't remember why I put here but it is pure C option, therefore it complains for nothings on cpp files
     -DWX_PRECOMP
 	)
 
@@ -43,6 +44,10 @@ endif()
 
 set(pcsx2FinalFlags ${pcsx2FinalFlags} ${CommonFlags})
 
+if(PORTAUDIO_FOUND)
+    set(pcsx2FinalFlags ${pcsx2FinalFlags} -DSPU2X_PORTAUDIO)
+endif()
+
 if(XDG_STD)
     set(pcsx2FinalFlags ${pcsx2FinalFlags} -DXDG_STD)
 endif()
@@ -58,6 +63,7 @@ set(pcsx2Sources
 	GameDatabase.cpp
 	Dump.cpp
 	Elfheader.cpp
+	FW.cpp
 	FiFo.cpp
 	FPU.cpp
 	Gif.cpp
@@ -77,6 +83,7 @@ set(pcsx2Sources
 	IopIrq.cpp
 	IopMem.cpp
 	IopSio2.cpp
+	IPC.cpp
 	Mdec.cpp
 	Memory.cpp
 	MMI.cpp
@@ -136,6 +143,7 @@ set(pcsx2Headers
 	Dump.h
 	GameDatabase.h
 	Elfheader.h
+	FW.h
 	Gif.h
 	Gif_Unit.h
 	GS.h
@@ -149,11 +157,11 @@ set(pcsx2Headers
 	IopHw.h
 	IopMem.h
 	IopSio2.h
+	IPC.h
 	Mdec.h
 	MTVU.h
 	Memory.h
 	MemoryTypes.h
-	NakedAsm.h
 	Patch.h
 	PathDefs.h
 	Plugins.h
@@ -184,7 +192,9 @@ set(pcsx2CDVDSources
 	CDVD/CdRom.cpp
 	CDVD/CDVDaccess.cpp
 	CDVD/CDVD.cpp
+	CDVD/CDVDdiscReader.cpp
 	CDVD/CDVDisoReader.cpp
+	CDVD/CDVDdiscThread.cpp
 	CDVD/InputIsoFile.cpp
 	CDVD/OutputIsoFile.cpp
 	CDVD/ChunksCache.cpp
@@ -202,6 +212,7 @@ set(pcsx2CDVDHeaders
 	CDVD/CDVDaccess.h
 	CDVD/CDVD.h
 	CDVD/CDVD_internal.h
+	CDVD/CDVDdiscReader.h
 	CDVD/CDVDisoReader.h
 	CDVD/ChunksCache.h
 	CDVD/CompressedFileReader.h
@@ -217,6 +228,213 @@ set(pcsx2CDVDHeaders
 	CDVD/IsoFS/SectorSource.h
 	CDVD/zlib_indexed.h
 	)
+
+# SPU2 sources
+set(pcsx2SPU2Sources
+	SPU2/ADSR.cpp
+	SPU2/Debug.cpp
+	SPU2/DplIIdecoder.cpp
+	SPU2/Dma.cpp
+	SPU2/Lowpass.cpp
+	SPU2/Mixer.cpp
+	SPU2/spu2.cpp
+	SPU2/ReadInput.cpp
+	SPU2/RegLog.cpp
+	SPU2/RegTable.cpp
+	SPU2/Reverb.cpp
+	SPU2/SndOut.cpp
+	SPU2/SndOut_SDL.cpp
+	SPU2/spu2freeze.cpp
+	SPU2/spu2replay.cpp
+	SPU2/spu2sys.cpp
+	SPU2/Timestretcher.cpp
+	SPU2/Wavedump_wav.cpp
+	SPU2/WavFile.cpp
+	SPU2/Linux/Alsa.cpp
+	SPU2/Linux/CfgHelpers.cpp
+	SPU2/Linux/Config.cpp
+	SPU2/Linux/ConfigDebug.cpp
+	SPU2/Linux/ConfigSoundTouch.cpp
+	SPU2/Linux/Dialogs.cpp
+	SPU2/wx/wxConfig.cpp
+    )
+
+if(PORTAUDIO_FOUND)
+    set(pcsx2SPU2Sources ${pcsx2SPU2Sources} SPU2/SndOut_Portaudio.cpp)
+endif()
+
+# SPU2 headers
+set(pcsx2SPU2Headers
+	SPU2/Config.h
+	SPU2/Debug.h
+	SPU2/defs.h
+	SPU2/Dma.h
+	SPU2/Global.h
+	SPU2/Lowpass.h
+	SPU2/Mixer.h
+	SPU2/spu2.h
+	SPU2/regs.h
+	SPU2/SndOut.h
+	SPU2/spdif.h
+	SPU2/spu2replay.h
+	SPU2/WavFile.h
+	SPU2/Linux/Alsa.h
+	SPU2/Linux/Config.h
+	SPU2/Linux/Dialogs.h
+	SPU2/wx/wxConfig.h
+)
+
+# DEV9 UI sources
+compile_gresources( pcsx2DEV9UISources
+					pcsx2DEV9UIXML 
+					TYPE EMBED_C
+					RESOURCES "DEV9/Linux/dev9.ui"
+					PREFIX "/net/pcsx2/dev9"
+					COMPRESS_ALL
+					STRIPBLANKS_ALL
+)
+
+# DEV9 UI headers
+compile_gresources( pcsx2DEV9UIHeaders
+					pcsx2DEV9UIXML
+					TYPE EMBED_H
+					RESOURCES "DEV9/Linux/dev9.ui"
+					PREFIX "/net/pcsx2/dev9"
+					COMPRESS_ALL
+					STRIPBLANKS_ALL
+)
+
+# DEV9 sources
+set(pcsx2DEV9Sources
+	DEV9/smap.cpp
+	DEV9/DEV9.cpp
+	DEV9/flash.cpp
+	DEV9/pcap_io.cpp
+	DEV9/Linux/Config.cpp
+	DEV9/Linux/Linux.cpp
+	DEV9/net.cpp
+	${pcsx2DEV9UISources}
+	)
+
+# DEV9 headers
+set(pcsx2DEV9Headers
+	DEV9/DEV9.h
+	DEV9/ata.h
+	DEV9/net.h
+	DEV9/pcap_io.h
+	DEV9/smap.h
+	${pcsx2DEV9UIHeaders}
+	)
+
+# USB sources 
+set(pcsx2USBSources
+	USB/USB.cpp
+	USB/deviceproxy.cpp
+	USB/configuration.cpp
+	USB/device_init.cpp
+	USB/qemu-usb/glib.cpp
+	USB/qemu-usb/vl.cpp
+	USB/qemu-usb/iov.cpp
+	USB/qemu-usb/desc.cpp
+	USB/qemu-usb/core.cpp
+	USB/qemu-usb/bus.cpp
+	USB/qemu-usb/usb-ohci.cpp
+	USB/qemu-usb/hid.cpp
+	USB/qemu-usb/input-keymap-qcode-to-qnum.cpp
+	USB/usb-msd/usb-msd.cpp
+	USB/usb-pad/usb-pad.cpp
+	USB/usb-pad/usb-pad-ff.cpp
+	USB/usb-pad/lg/lg_ff.cpp
+	USB/usb-pad/usb-seamic.cpp
+	USB/usb-mic/usb-mic-singstar.cpp
+	USB/usb-mic/usb-mic-logitech.cpp
+	USB/usb-mic/usb-headset.cpp
+	USB/usb-eyetoy/jpgd/jpgd.cpp
+	USB/usb-eyetoy/jo_mpeg.cpp
+	USB/usb-eyetoy/usb-eyetoy-webcam.cpp
+	USB/usb-hid/usb-hid.cpp
+	USB/shared/shared_usb.cpp
+	USB/shared/inifile_usb.cpp
+	USB/shared/ringbuffer.cpp
+	USB/icon_buzz_24.cpp
+	USB/usb-msd/usb-msd-gtk.cpp
+	USB/usb-pad/joydev/joydev.cpp
+	USB/usb-pad/joydev/joydev-gtk.cpp
+	USB/usb-pad/evdev/shared-gtk.cpp
+	USB/usb-pad/evdev/evdev-ff.cpp
+	USB/usb-pad/evdev/evdev.cpp
+	USB/usb-pad/evdev/evdev-gtk.cpp
+	USB/usb-hid/evdev/evdev-gtk.cpp
+	USB/usb-eyetoy/cam-linux.cpp
+	USB/linux/config.cpp
+	USB/linux/config-gtk.cpp
+	USB/linux/util.cpp
+	USB/qemu-usb/input-keymap-linux-to-qcode.cpp
+	USB/usb-mic/audiodev-pulse.cpp
+	USB/usb-pad/api_init_linux.cpp
+	USB/usb-eyetoy/api_init_linux.cpp
+	USB/usb-hid/api_init_linux.cpp
+	USB/usb-mic/api_init_linux.cpp
+    )
+
+# USB headers
+set(pcsx2USBHeaders
+	USB/USB.h
+	USB/proxybase.h
+	USB/deviceproxy.h
+	USB/configuration.h
+	USB/platcompat.h
+	USB/helpers.h
+	USB/readerwriterqueue/readerwriterqueue.h
+	USB/readerwriterqueue/atomicops.h
+	USB/qemu-usb/glib.h
+	USB/qemu-usb/vl.h
+	USB/qemu-usb/qusb.h
+	USB/qemu-usb/USBinternal.h
+	USB/qemu-usb/desc.h
+	USB/qemu-usb/iov.h
+	USB/qemu-usb/queue.h
+	USB/qemu-usb/hid.h
+	USB/qemu-usb/input-keymap.h
+	USB/usb-msd/usb-msd.h
+	USB/usb-pad/usb-pad.h
+	USB/usb-pad/padproxy.h
+	USB/usb-pad/lg/lg_ff.h
+	USB/usb-mic/audio.h
+	USB/usb-mic/audiodev.h
+	USB/usb-mic/audiodeviceproxy.h
+	USB/usb-mic/usb-mic-singstar.h
+	USB/usb-mic/usb-headset.h
+	USB/usb-mic/audiodev-noop.h
+	USB/usb-eyetoy/jpgd/jpgd.h
+	USB/usb-eyetoy/jo_mpeg.h
+	USB/usb-eyetoy/videodeviceproxy.h
+	USB/usb-eyetoy/videodev.h
+	USB/usb-eyetoy/usb-eyetoy-webcam.h
+	USB/usb-eyetoy/ov519.h
+	USB/usb-hid/hidproxy.h
+	USB/usb-hid/usb-hid.h
+	USB/usb-hid/noop.h
+	USB/shared/shared_usb.h
+	USB/shared/inifile_usb.h
+	USB/shared/ringbuffer.h
+	USB/linux/ini.h
+	USB/linux/actualfile.h
+	USB/linux/config.h
+	USB/linux/util.h
+	USB/gtk.h
+	USB/icon_buzz_24.h
+	USB/usb-pad/joydev/joydev.h
+	USB/usb-pad/evdev/shared.h
+	USB/usb-pad/evdev/evdev.h
+	USB/usb-pad/evdev/evdev-ff.h
+	USB/usb-hid/evdev/evdev.h
+	USB/usb-hid/evdev/evdev.cpp
+	USB/usb-eyetoy/cam-linux.h
+	USB/qemu-usb/input-keymap-linux-to-qcode.h
+	USB/usb-mic/audiodev-pulse.h
+    )
+
 
 # DebugTools sources
 set(pcsx2DebugToolsSources
@@ -285,6 +503,7 @@ set(pcsx2GuiSources
 	gui/Debugger/DebuggerLists.cpp
 	gui/Debugger/DisassemblyDialog.cpp
 	gui/Debugger/DebugEvents.cpp
+	gui/DriveList.cpp
 	gui/ExecutorThread.cpp
 	gui/FrameForGS.cpp
 	gui/GlobalCommands.cpp
@@ -342,6 +561,7 @@ set(pcsx2GuiHeaders
 	gui/Dialogs/ConfigurationDialog.h
 	gui/Dialogs/LogOptionsDialog.h
 	gui/Dialogs/ModalPopups.h
+	gui/DriveList.h
 	gui/GSFrame.h
 	gui/i18n.h
 	gui/IsoDropTarget.h
@@ -358,7 +578,7 @@ set(pcsx2GuiHeaders
 	)
 
 # Warning: the declaration of the .h are mandatory in case of resources files. It will ensure the creation
-# from the bin2cpp tools at the good moment (ie .h must be created before the pcsx2 compilation)
+# from the bin2cpp tools at right good moment (ie .h must be created before the pcsx2 compilation)
 # Gui resources headers
 set(res_bin "${CMAKE_BINARY_DIR}/pcsx2/gui/Resources")
 set(res_src "${CMAKE_SOURCE_DIR}/pcsx2/gui/Resources")
@@ -384,6 +604,7 @@ set(pcsx2GuiResources
 set(pcsx2IPUSources
 	IPU/IPU.cpp
 	IPU/IPU_Fifo.cpp
+	IPU/IPUdither.cpp
 	IPU/IPUdma.cpp
 	IPU/mpeg2lib/Idct.cpp
 	IPU/mpeg2lib/Mpeg.cpp
@@ -401,6 +622,8 @@ set(pcsx2IPUHeaders
 
 # Linux sources
 set(pcsx2LinuxSources
+	CDVD/Linux/DriveUtility.cpp
+	CDVD/Linux/IOCtlSrc.cpp
 	gui/CpuUsageProviderLnx.cpp
 	Linux/LnxConsolePipe.cpp
 	Linux/LnxKeyCodes.cpp
@@ -408,13 +631,17 @@ set(pcsx2LinuxSources
     )
 
 set(pcsx2OSXSources
+	CDVD/Linux/DriveUtility.cpp
+	CDVD/Linux/IOCtlSrc.cpp
 	gui/CpuUsageProviderLnx.cpp
-#	Linux/LnxConsolePipe.cpp
+	Linux/LnxConsolePipe.cpp
 #	Linux/LnxKeyCodes.cpp
 	Darwin/DarwinFlatFileReader.cpp
 	)
 
 set(pcsx2FreeBSDSources
+	CDVD/Linux/DriveUtility.cpp
+	CDVD/Linux/IOCtlSrc.cpp
 	gui/CpuUsageProviderLnx.cpp
 	Linux/LnxConsolePipe.cpp
 	Linux/LnxKeyCodes.cpp
@@ -463,25 +690,56 @@ set(pcsx2RDebugHeaders
 	RDebug/deci2_ttyp.h)
 
 # Recording sources
+set(rec_src "Recording")
+set(rec_vp_src "${rec_src}/VirtualPad")
 set(pcsx2RecordingSources
-	Recording/InputRecording.cpp
-	Recording/InputRecordingFile.cpp
-	Recording/NewRecordingFrame.cpp
-	Recording/PadData.cpp
-	Recording/RecordingControls.cpp
-	Recording/RecordingInputManager.cpp
-	Recording/VirtualPad.cpp
+	${rec_src}/InputRecording.cpp
+	${rec_src}/InputRecordingControls.cpp
+	${rec_src}/InputRecordingFile.cpp
+	${rec_src}/NewRecordingFrame.cpp
+	${rec_src}/PadData.cpp
+	${rec_vp_src}/VirtualPad.cpp
+	${rec_vp_src}/VirtualPadData.cpp
+	${rec_vp_src}/VirtualPadResources.cpp
 )
 
 # Recording headers
 set(pcsx2RecordingHeaders
-	Recording/InputRecording.h
-	Recording/InputRecordingFile.h
-	Recording/NewRecordingFrame.h
-	Recording/PadData.h
-	Recording/RecordingControls.h
-	Recording/RecordingInputManager.h
-	Recording/VirtualPad.h
+	${rec_src}/InputRecording.h
+	${rec_src}/InputRecordingControls.h
+	${rec_src}/InputRecordingFile.h
+	${rec_src}/NewRecordingFrame.h
+	${rec_src}/PadData.h
+	${rec_src}/Utilities/InputRecordingLogger.h
+	${rec_vp_src}/VirtualPad.h
+	${rec_vp_src}/VirtualPadData.h
+	${rec_vp_src}/VirtualPadResources.h
+)
+
+# Warning: the declaration of the .h are mandatory in case of resources files. It will ensure the creation
+# from the bin2cpp tools at the right moment (ie .h must be created before the pcsx2 compilation)
+# Recording - VirtualPad resources headers
+set(res_rec_vp_src "${CMAKE_SOURCE_DIR}/pcsx2/Recording/VirtualPad/img")
+set(pcsx2RecordingVirtualPadResources
+	${res_rec_vp_src}/circlePressed.h
+	${res_rec_vp_src}/controllerFull.h
+	${res_rec_vp_src}/controllerHalf.h
+	${res_rec_vp_src}/controllerThreeQuarters.h
+	${res_rec_vp_src}/crossPressed.h
+	${res_rec_vp_src}/downPressed.h
+	${res_rec_vp_src}/l1Pressed.h
+	${res_rec_vp_src}/l2Pressed.h
+	${res_rec_vp_src}/l3Pressed.h
+	${res_rec_vp_src}/leftPressed.h
+	${res_rec_vp_src}/r1Pressed.h
+	${res_rec_vp_src}/r2Pressed.h
+	${res_rec_vp_src}/r3Pressed.h
+	${res_rec_vp_src}/rightPressed.h
+	${res_rec_vp_src}/selectPressed.h
+	${res_rec_vp_src}/squarePressed.h
+	${res_rec_vp_src}/startPressed.h
+	${res_rec_vp_src}/trianglePressed.h
+	${res_rec_vp_src}/upPressed.h
 )
 
 # System sources
@@ -514,10 +772,9 @@ set(pcsx2ZipToolsHeaders
 
 # Windows sources
 set(pcsx2WindowsSources
+	CDVD/Windows/DriveUtility.cpp
+	CDVD/Windows/IOCtlSrc.cpp
 	gui/CpuUsageProviderMSW.cpp
-	windows/cheats/browser.cpp
-	windows/cheats/cheats.cpp
-	windows/DwmSetup.cpp
 	windows/FlatFileReaderWindows.cpp
 	windows/Optimus.cpp
 	windows/PatchBrowser.cpp
@@ -529,7 +786,6 @@ set(pcsx2WindowsSources
 
 # Windows headers
 set(pcsx2WindowsHeaders
-	windows/cheats/cheats.h
 	windows/resource.h
 	windows/Win32.h)
 
@@ -562,14 +818,6 @@ set(pcsx2x86Sources
 	x86/newVif_Unpack.cpp
 	x86/newVif_UnpackSSE.cpp
 	)
-if (NOT DISABLE_SVU)
-    set(pcsx2x86Sources ${pcsx2x86Sources}
-	x86/sVU_Lower.cpp
-	x86/sVU_Micro.cpp
-	x86/sVU_Upper.cpp
-	x86/sVU_zerorec.cpp
-    )
-endif()
 
 # x86 headers
 set(pcsx2x86Headers
@@ -610,19 +858,7 @@ set(pcsx2x86Headers
 	x86/newVif_HashBucket.h
 	x86/newVif_UnpackSSE.h
 	x86/R5900_Profiler.h
-	x86/sVU_Micro.h
-	x86/sVU_zerorec.h
 	)
-
-# collect .S files
-if (NOT DISABLE_SVU)
-    set(pcsx2SSources x86/aVUzerorec.S)
-    # change language of .S-files to c++
-    set_source_files_properties(${pcsx2SSources} PROPERTIES LANGUAGE CXX)
-else()
-    set(pcsx2SSources "")
-endif()
-
 
 # common Sources
 set(Common
@@ -630,6 +866,12 @@ set(Common
 	${pcsx2Headers}
 	${pcsx2CDVDSources}
 	${pcsx2CDVDHeaders}
+	${pcsx2SPU2Sources}
+	${pcsx2SPU2Headers}
+	${pcsx2DEV9Sources}
+	${pcsx2DEV9Headers}
+    ${pcsx2USBSources}
+    ${pcsx2USBHeaders}
 	${pcsx2DebugToolsSources}
 	${pcsx2GuiSources}
 	${pcsx2GuiResources}
@@ -639,6 +881,7 @@ set(Common
 	${pcsx2ps2Sources}
 	${pcsx2ps2Headers}
 	${pcsx2RecordingSources}
+	${pcsx2RecordingVirtualPadResources}
 	${pcsx2RecordingHeaders}
 	${pcsx2SystemSources}
 	${pcsx2SystemHeaders}
@@ -647,15 +890,19 @@ set(Common
 	${pcsx2x86Sources}
 	${pcsx2x86Headers}
 	${pcsx2ZipToolsSources}
-	${pcsx2ZipToolsHeaders}
-	${pcsx2SSources})
+	${pcsx2ZipToolsHeaders})
 
 # platform sources
 # Linux
 if(Linux)
 	set(Platform
 		${pcsx2LinuxSources}
-		${pcsx2LinuxHeaders})
+		${pcsx2LinuxHeaders}
+		)
+		
+	set(Platform_Libs
+		${LIBUDEV_LIBRARIES}
+		)
 endif()
 
 # Windows
@@ -686,33 +933,31 @@ set(pcsx2FinalSources
 set(pcsx2FinalLibs
     Utilities
     x86emitter
+    fmt::fmt
     ${wxWidgets_LIBRARIES}
     ${GTK2_LIBRARIES}
     ${ZLIB_LIBRARIES}
     ${AIO_LIBRARIES}
     ${GCOV_LIBRARIES}
+    ${ALSA_LIBRARIES}
+    ${SOUNDTOUCH_LIBRARIES}
+    ${SDL2_LIBRARIES}
+    ${PCAP_LIBRARY}
+    ${LIBSAMPLERATE_LIBRARIES}
+    ${PULSEAUDIO_LIBRARIES}
+    ${LIBXML2_LIBRARIES}
+    ${Platform_Libs}
 )
+
+if(PORTAUDIO_FOUND)
+    set(pcsx2FinalLibs ${pcsx2FinalLibs} ${PORTAUDIO_LIBRARIES})
+endif()
 
 if(BUILTIN_GS)
     set(pcsx2FinalLibs "${pcsx2FinalLibs} GSdx")
 endif()
 if(BUILTIN_PAD)
     set(pcsx2FinalLibs "${pcsx2FinalLibs} onepad-1.2.0")
-endif()
-if(BUILTIN_SPU2)
-    set(pcsx2FinalLibs "${pcsx2FinalLibs} spu2x-2.0.0")
-endif()
-if(BUILTIN_USB)
-    set(pcsx2FinalLibs "${pcsx2FinalLibs} USBnull-0.7.0")
-endif()
-if(BUILTIN_FW)
-    set(pcsx2FinalLibs "${pcsx2FinalLibs} FWnull-0.7.0")
-endif()
-if(BUILTIN_DEV)
-    set(pcsx2FinalLibs "${pcsx2FinalLibs} dev9null-0.5.0")
-endif()
-if(BUILTIN_CDVD)
-    set(pcsx2FinalLibs "${pcsx2FinalLibs} CDVDnull")
 endif()
 
 # additonal include directories
@@ -732,13 +977,57 @@ foreach(res_file IN ITEMS
     add_custom_command(OUTPUT  "${res_bin}/${res_file}.h" COMMAND perl ${CMAKE_SOURCE_DIR}/linux_various/hex2h.pl "${res_src}/${res_file}.png" "${res_bin}/${res_file}" )
 endforeach()
 
+### Generate Recording resource files
+### Drop them into the folder alongside the png files
+foreach(res_file IN ITEMS
+				circlePressed controllerFull controllerHalf controllerThreeQuarters crossPressed downPressed l1Pressed l2Pressed l3Pressed leftPressed
+				r1Pressed r2Pressed r3Pressed rightPressed selectPressed squarePressed startPressed trianglePressed upPressed)
+    add_custom_command(OUTPUT  "${res_rec_vp_src}/${res_file}.h" COMMAND perl ${CMAKE_SOURCE_DIR}/linux_various/hex2h.pl "${res_rec_vp_src}/${res_file}.png" "${res_rec_vp_src}/${res_file}" )
+endforeach()
+
 if(USE_VTUNE)
     set(pcsx2FinalLibs ${pcsx2FinalLibs} ${VTUNE_LIBRARIES})
 endif()
 
 add_pcsx2_executable(${Output} "${pcsx2FinalSources}" "${pcsx2FinalLibs}" "${pcsx2FinalFlags}")
+target_compile_features(${Output} PRIVATE cxx_std_17)
 
-if(dev9ghzdrk)
+if(COMMAND target_precompile_headers)
+	message("Using precompiled headers.")
+	target_precompile_headers(${Output} PRIVATE PrecompiledHeader.h)
+endif()
+
+if (APPLE)
+	# MacOS defaults to having a maximum protection of the __DATA segment of rw (non-executable)
+	# We have a bunch of page-sized arrays in bss that we use for jit
+	# Obviously not being able to make those arrays executable would be a problem
+	target_link_options(${Output} PRIVATE -Wl,-segprot,__DATA,rwx,rw)
+
+	set_target_properties(${Output} PROPERTIES
+		MACOSX_BUNDLE true
+		MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/gui/Resources/Info.plist.in"
+		OUTPUT_NAME PCSX2
+	)
+
+	target_sources(${Output} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/gui/Resources/PCSX2.icns")
+	set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/gui/Resources/PCSX2.icns" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+
+	# If they say to skip postprocess bundle, leave the target in but make it so they have
+	# to manually run it
+	if (SKIP_POSTPROCESS_BUNDLE)
+		set(postprocessBundleType "")
+	else()
+		set(postprocessBundleType ALL)
+	endif()
+	# Use custom_target and not custom_command so plugins can add themselves as dependencies
+	add_custom_target(pcsx2-postprocess-bundle ${postprocessBundleType}
+		COMMAND ${CMAKE_COMMAND} "-DPCSX2_BUNDLE_PATH=$<TARGET_FILE_DIR:${Output}>/../.."
+			-P ${CMAKE_SOURCE_DIR}/cmake/Pcsx2PostprocessBundle.cmake
+	)
+	add_dependencies(pcsx2-postprocess-bundle ${Output})
+endif()
+
+if(NOT DISABLE_SETCAP)
     if(PACKAGE_MODE)
         install(CODE "execute_process(COMMAND /bin/bash -c \"echo 'Enabling networking capability on Linux...';set -x; [ -f ${BIN_DIR}/${Output} ] && sudo setcap 'CAP_NET_RAW+eip CAP_NET_ADMIN+eip' ${BIN_DIR}/${Output}; set +x\")")
     else()

@@ -38,8 +38,8 @@ void mVUreserveCache(microVU& mVU) {
 	mVU.cache_reserve->SetProfilerName(pxsFmt("mVU%urec", mVU.index));
 	
 	mVU.cache = mVU.index ?
-		(u8*)mVU.cache_reserve->Reserve(mVU.cacheSize * _1mb, HostMemoryMap::mVU1rec):
-		(u8*)mVU.cache_reserve->Reserve(mVU.cacheSize * _1mb, HostMemoryMap::mVU0rec);
+		(u8*)mVU.cache_reserve->Reserve(GetVmMemory().MainMemory(), HostMemoryMap::mVU1recOffset, mVU.cacheSize * _1mb):
+		(u8*)mVU.cache_reserve->Reserve(GetVmMemory().MainMemory(), HostMemoryMap::mVU0recOffset, mVU.cacheSize * _1mb);
 
 	mVU.cache_reserve->ThrowIfNotOk();
 }
@@ -230,28 +230,27 @@ void mVUprintUniqueRatio(microVU& mVU) {
 	DevCon.WriteLn("%d / %d [%3.1f%%]", v.size(), total, 100.-(double)v.size()/(double)total*100.);
 }
 
-// Compare partial program by only checking compiled ranges...
-__ri bool mVUcmpPartial(microVU& mVU, microProgram& prog) {
-	std::deque<microRange>::const_iterator it(prog.ranges->begin());
-	for ( ; it != prog.ranges->end(); ++it) {
-		if((it[0].start<0)||(it[0].end<0))  { DevCon.Error("microVU%d: Negative Range![%d][%d]", mVU.index, it[0].start, it[0].end); }
-		if (memcmp_mmx(cmpOffset(prog.data), cmpOffset(mVU.regs().Micro), ((it[0].end + 8)  -  it[0].start))) {
-			return 0;
-		}
-	}
-	return 1;
-}
-
 // Compare Cached microProgram to mVU.regs().Micro
 __fi bool mVUcmpProg(microVU& mVU, microProgram& prog, const bool cmpWholeProg) {
-	if ((cmpWholeProg && !memcmp_mmx((u8*)prog.data, mVU.regs().Micro, mVU.microMemSize))
-	|| (!cmpWholeProg && mVUcmpPartial(mVU, prog))) {
-		mVU.prog.cleared =  0;
-		mVU.prog.cur	 = &prog;
-		mVU.prog.isSame  =  cmpWholeProg ? 1 : -1;
-		return true;
+	if (cmpWholeProg)
+	{
+		if (memcmp_mmx((u8*)prog.data, mVU.regs().Micro, mVU.microMemSize))
+			return false;
 	}
-	return false;
+	else
+	{
+		for (const auto& range : *prog.ranges) {
+			auto cmpOffset = [&](void* x) { return (u8*)x + range.start; };
+			if ((range.start < 0) || (range.end < 0)) { DevCon.Error("microVU%d: Negative Range![%d][%d]", mVU.index, range.start, range.end); }
+			if (memcmp_mmx(cmpOffset(prog.data), cmpOffset(mVU.regs().Micro), ((range.end+8) - range.start))) {
+				return false;
+			}
+		}
+	}
+	mVU.prog.cleared = 0;
+	mVU.prog.cur = &prog;
+	mVU.prog.isSame = cmpWholeProg ? 1 : -1;
+	return true;
 }
 
 // Searches for Cached Micro Program and sets prog.cur to it (returns entry-point to program)
@@ -351,13 +350,16 @@ void recMicroVU1::Reset() {
 void recMicroVU0::Execute(u32 cycles) {
 	pxAssert(m_Reserved); // please allocate me first! :|
 
+	VU0.flags &= ~VUFLAG_MFLAGSET;
+
 	if(!(VU0.VI[REG_VPU_STAT].UL & 1)) return;
+	VU0.VI[REG_TPC].UL <<= 3;
 
 	// Sometimes games spin on vu0, so be careful with this value
 	// woody hangs if too high on sVU (untested on mVU)
 	// Edit: Need to test this again, if anyone ever has a "Woody" game :p
 	((mVUrecCall)microVU0.startFunct)(VU0.VI[REG_TPC].UL, cycles);
-
+	VU0.VI[REG_TPC].UL >>= 3;
 	if(microVU0.regs().flags & 0x4)
 	{
 		microVU0.regs().flags &= ~0x4;
@@ -370,8 +372,9 @@ void recMicroVU1::Execute(u32 cycles) {
 	if (!THREAD_VU1) {
 		if(!(VU0.VI[REG_VPU_STAT].UL & 0x100)) return;
 	}
+	VU1.VI[REG_TPC].UL <<= 3;
 	((mVUrecCall)microVU1.startFunct)(VU1.VI[REG_TPC].UL, cycles);
-
+	VU1.VI[REG_TPC].UL >>= 3;
 	if(microVU1.regs().flags & 0x4)
 	{
 		microVU1.regs().flags &= ~0x4;
